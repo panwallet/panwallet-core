@@ -30,11 +30,11 @@
 #include <assert.h>
 #include <pthread.h>
 
-#define BITCOIN_PRIVKEY      128
+#define BITCOIN_PRIVKEY      176
 #define BITCOIN_PRIVKEY_TEST 239
 
 #if __BIG_ENDIAN__ || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) ||\
-    __ARMEB__ || __THUMBEB__ || __AARCH64EB__ || __MIPSEB__
+__ARMEB__ || __THUMBEB__ || __AARCH64EB__ || __MIPSEB__
 #define WORDS_BIGENDIAN        1
 #endif
 #define DETERMINISTIC          1
@@ -125,7 +125,7 @@ int BRPrivKeyIsValid(const char *privKey)
     int r = 0;
     
     assert(privKey != NULL);
-
+    
     dataLen = BRBase58CheckDecode(data, sizeof(data), privKey);
     strLen = strlen(privKey);
     
@@ -175,7 +175,7 @@ int BRKeySetPrivKey(BRKey *key, const char *privKey)
 #if BITCOIN_TESTNET
     version = BITCOIN_PRIVKEY_TEST;
 #endif
-
+    
     assert(key != NULL);
     assert(privKey != NULL);
     
@@ -188,13 +188,13 @@ int BRKeySetPrivKey(BRKey *key, const char *privKey)
     else {
         len = BRBase58CheckDecode(data, sizeof(data), privKey);
         if (len == 0 || len == 28) len = BRBase58Decode(data, sizeof(data), privKey);
-
+        
         if (len < sizeof(UInt256) || len > sizeof(UInt256) + 2) { // treat as hex string
             for (len = 0; privKey[len*2] && privKey[len*2 + 1] && len < sizeof(data); len++) {
                 if (sscanf(&privKey[len*2], "%2hhx", &data[len]) != 1) break;
             }
         }
-
+        
         if ((len == sizeof(UInt256) + 1 || len == sizeof(UInt256) + 2) && data[0] == version) {
             r = BRKeySetSecret(key, (UInt256 *)&data[1], (len == sizeof(UInt256) + 2));
         }
@@ -202,7 +202,7 @@ int BRKeySetPrivKey(BRKey *key, const char *privKey)
             r = BRKeySetSecret(key, (UInt256 *)data, 0);
         }
     }
-
+    
     mem_clean(data, sizeof(data));
     return r;
 }
@@ -228,7 +228,7 @@ int BRKeySetPubKey(BRKey *key, const uint8_t *pubKey, size_t pkLen)
 size_t BRKeyPrivKey(const BRKey *key, char *privKey, size_t pkLen)
 {
     uint8_t data[34];
-
+    
     assert(key != NULL);
     
     if (secp256k1_ec_seckey_verify(_ctx, key->secret.u8)) {
@@ -253,7 +253,7 @@ size_t BRKeyPubKey(BRKey *key, void *pubKey, size_t pkLen)
     static uint8_t empty[65]; // static vars initialize to zero
     size_t size = (key->compressed) ? 33 : 65;
     secp256k1_pubkey pk;
-
+    
     assert(key != NULL);
     
     if (memcmp(key->pubKey, empty, size) == 0) {
@@ -263,7 +263,7 @@ size_t BRKeyPubKey(BRKey *key, void *pubKey, size_t pkLen)
         }
         else size = 0;
     }
-
+    
     if (pubKey && size <= pkLen) memcpy(pubKey, key->pubKey, size);
     return (! pubKey || size <= pkLen) ? size : 0;
 }
@@ -287,7 +287,7 @@ size_t BRKeyAddress(BRKey *key, char *addr, size_t addrLen)
 {
     UInt160 hash;
     uint8_t data[21];
-
+    
     assert(key != NULL);
     
     hash = BRKeyHash160(key);
@@ -296,7 +296,7 @@ size_t BRKeyAddress(BRKey *key, char *addr, size_t addrLen)
     data[0] = BITCOIN_PUBKEY_ADDRESS_TEST;
 #endif
     UInt160Set(&data[1], hash);
-
+    
     if (! UInt160IsZero(hash)) {
         addrLen = BRBase58CheckEncode(addr, addrLen, data, sizeof(data));
     }
@@ -358,10 +358,10 @@ size_t BRKeyCompactSign(const BRKey *key, void *compactSig, size_t sigLen, UInt2
     size_t r = 0;
     int recid = 0;
     secp256k1_ecdsa_recoverable_signature s;
-
+    
     assert(key != NULL);
     assert(sigLen >= 65 || compactSig == NULL);
-
+    
     if (! UInt256IsZero(key->secret)) { // can't sign with a public key
         if (compactSig && sigLen >= 65 &&
             secp256k1_ecdsa_sign_recoverable(_ctx, &s, md.u8, key->secret.u8, secp256k1_nonce_function_rfc6979, NULL) &&
@@ -396,9 +396,9 @@ int BRKeyRecoverPubKey(BRKey *key, UInt256 md, const void *compactSig, size_t si
             secp256k1_ecdsa_recover(_ctx, &pk, &s, md.u8) &&
             secp256k1_ec_pubkey_serialize(_ctx, pubKey, &len, &pk,
                                           (compressed ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED))) {
-            r = BRKeySetPubKey(key, pubKey, len);
-        }
+                r = BRKeySetPubKey(key, pubKey, len);
+            }
     }
-
+    
     return r;
 }

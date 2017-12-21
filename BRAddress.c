@@ -368,9 +368,9 @@ int BRAddressIsValid(const char *addr)
     if (BRBase58CheckDecode(data, sizeof(data), addr) == 21) {
         r = (data[0] == BITCOIN_PUBKEY_ADDRESS || data[0] == BITCOIN_SCRIPT_ADDRESS);
     
-#if BITCOIN_TESTNET
+    #if BITCOIN_TESTNET
         r = (data[0] == BITCOIN_PUBKEY_ADDRESS_TEST || data[0] == BITCOIN_SCRIPT_ADDRESS_TEST);
-#endif
+    #endif
     }
     
     return r;
