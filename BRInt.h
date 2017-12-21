@@ -297,7 +297,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
     
     // 256-bit arithmetic functions
     
-    uint32_t bits( UInt256 pn )
+    inline static uint32_t bits( UInt256 pn )
     {
         for (int pos = WIDTH - 1; pos >= 0; pos--) {
             if (pn.u32[pos]) {
@@ -311,7 +311,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return 0;
     }
     
-    uint32_t compareTo( UInt256 lhs, UInt256 rhs ) {
+    inline static uint32_t compareTo( UInt256 lhs, UInt256 rhs ) {
         for (int i = WIDTH - 1; i >= 0; i--) {
             if (lhs.u32[i] < rhs.u32[i])
                 return -1;
@@ -321,21 +321,21 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return 0;
     }
     
-    UInt256 prefix( UInt256 rhs ) {
+    inline static UInt256 prefix( UInt256 rhs ) {
         uint32_t i = 0;
         while (++rhs.u32[i] == 0 && i < WIDTH - 1)
             i++;
         return rhs;
     }
     
-    UInt256 hyphen( UInt256 lhs ) {
+    inline static UInt256 hyphen( UInt256 lhs ) {
         UInt256 rhs = UINT256_ZERO;
         for (int i = 0; i < WIDTH; i++)
             rhs.u32[i] = ~lhs.u32[i];
         return prefix( rhs );
     }
     
-    UInt256 arithAdd( UInt256 lhs, UInt256 rhs ) {
+    inline static UInt256 arithAdd( UInt256 lhs, UInt256 rhs ) {
         uint64_t carry = 0;
         for (int i = 0; i < WIDTH; i++) {
             uint64_t n = carry + lhs.u32[i] + rhs.u32[i];
@@ -345,17 +345,17 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return lhs;
     }
     
-    UInt256 arithSub( UInt256 lhs, UInt256 rhs ) {
+    inline static UInt256 arithSub( UInt256 lhs, UInt256 rhs ) {
         lhs = arithAdd( lhs, hyphen( rhs ) );
         return lhs;
     }
     
-    uint64_t getLow64 ( UInt256 lhs ) {
+    inline static uint64_t getLow64 ( UInt256 lhs ) {
         assert( WIDTH >= 2 );
         return lhs.u32[0] | (uint64_t)lhs.u32[1] << 32;
     }
     
-    UInt256 u64_to_u256 ( uint64_t num ) {
+    inline static UInt256 u64_to_u256 ( uint64_t num ) {
         UInt256 newU = UINT256_ZERO;
         newU.u32[0] = (uint32_t)num;
         newU.u32[1] = (uint32_t)(num >> 32);
@@ -364,7 +364,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return newU;
     }
     
-    UInt256 leftShift( UInt256 lhs, uint32_t shift ) {
+    inline static UInt256 leftShift( UInt256 lhs, uint32_t shift ) {
         uint32_t a[WIDTH];
         for ( uint32_t i = 0; i < WIDTH; i++ )
             a[i] = lhs.u32[i];
@@ -383,7 +383,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return lhs;
     }
     
-    UInt256 rightShift( UInt256 lhs, uint32_t shift ) {
+    inline static UInt256 rightShift( UInt256 lhs, uint32_t shift ) {
         uint32_t a[WIDTH];
         for ( uint32_t i = 0; i < WIDTH; i++ )
             a[i] = lhs.u32[i];
@@ -401,7 +401,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return lhs;
     }
     
-    UInt256 setCompact ( uint32_t blockTarget ) {
+    inline static UInt256 setCompact ( uint32_t blockTarget ) {
         uint32_t size = blockTarget >> 24;
         uint32_t target = blockTarget & 0x007fffff;
         
@@ -419,7 +419,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return result;
     }
     
-    uint32_t getCompact ( UInt256 lhs ) {
+    inline static uint32_t getCompact ( UInt256 lhs ) {
         uint32_t size = ( bits( lhs ) + 7 ) / 8;
         uint32_t compact = 0;
         UInt256 bn = UINT256_ZERO;
@@ -442,7 +442,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return compact;
     }
     
-    UInt256 stdMultiply( UInt256 lhs, uint64_t factor ) {
+    inline static UInt256 stdMultiply( UInt256 lhs, uint64_t factor ) {
         uint64_t carry = 0;
         for (int i = 0; i < WIDTH; i++) {
             uint64_t n = carry + (uint32_t)factor * lhs.u32[i];
@@ -452,13 +452,13 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return lhs;
     }
     
-    UInt256 stdAdd( UInt256 lhs, uint64_t summand ) {
+    inline static UInt256 stdAdd( UInt256 lhs, uint64_t summand ) {
         UInt256 sum = u64_to_u256( summand );
         lhs = arithAdd( lhs, sum );
         return lhs;
     }
     
-    UInt256 stdDivide( UInt256 lhs, uint64_t divisor ) {
+    inline static UInt256 stdDivide( UInt256 lhs, uint64_t divisor ) {
         UInt256 newDivisor = u64_to_u256( divisor );
         UInt256 div = newDivisor;
         UInt256 num = lhs;
