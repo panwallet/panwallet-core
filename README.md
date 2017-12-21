@@ -1,4 +1,4 @@
-# breadwallet-core
-SPV bitcoin C library
+# Pan Wallet core
+SPV monacoin C library
 
-[getting sarted](https://github.com/breadwallet/breadwallet-core/wiki)
+[getting sarted](https://github.com/edgarnet/panwallet-core/wiki)
