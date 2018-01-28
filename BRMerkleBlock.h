@@ -90,7 +90,7 @@ extern "C" {
     int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, BRMerkleBlock *previous);
     
     // returns the next expected target of the previous block
-    uint32_t DarkGravityWave(BRSet *blocks, BRMerkleBlock *previous);
+    uint32_t DarkGravityWave(const BRSet *blocks, BRMerkleBlock *previous);
     
     // returns a hash value for block suitable for use in a hashtable
     inline static size_t BRMerkleBlockHash(const void *block)

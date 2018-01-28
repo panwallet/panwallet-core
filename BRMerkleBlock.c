@@ -352,7 +352,7 @@ int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, BRMerkleBlock *pre
 
 // current difficulty formula, dash - DarkGravity v3, written by Evan Duffield - evan@dashpay.io
 // TODO!
-uint32_t DarkGravityWave(BRSet *blocks, BRMerkleBlock *previous) {
+uint32_t DarkGravityWave(const BRSet *blocks, BRMerkleBlock *previous) {
     assert(previous != NULL);
     assert(blocks != NULL);
 
