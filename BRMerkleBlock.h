@@ -35,12 +35,15 @@
 extern "C" {
 #endif
     
-#define BLOCK_DIFFICULTY_INTERVAL 2016      // number of blocks between download adjustments
+#define BLOCK_DIFFICULTY_INTERVAL 2016          // number of blocks between download adjustments
 #define BLOCK_UNKNOWN_HEIGHT      INT32_MAX
-#define BLOCK_MAX_TIME_DRIFT      (2*60*60) // the furthest in the future a block is allowed to be timestamped
+#define BLOCK_MAX_TIME_DRIFT      (2*60*60)     // the furthest in the future a block is allowed to be timestamped
+#define BEGIN(a)                  ((char*)&(a))
     
     typedef struct {
         UInt256 blockHash;
+        UInt256 scryptHash;
+        UInt256 lyraHash;
         uint32_t version;
         UInt256 prevBlock;
         UInt256 merkleRoot;
@@ -62,7 +65,7 @@ extern "C" {
     
     // buf must contain either a serialized merkleblock or header
     // returns a merkle block struct that must be freed by calling BRMerkleBlockFree()
-    BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen);
+    BRMerkleBlock *BRMerkleBlockParse(const uint8_t *buf, size_t bufLen, uint32_t currentHeight);
     
     // returns number of bytes written to buf, or total bufLen needed if buf is NULL (block->height is not serialized)
     size_t BRMerkleBlockSerialize(const BRMerkleBlock *block, uint8_t *buf, size_t bufLen);
@@ -84,10 +87,10 @@ extern "C" {
     int BRMerkleBlockContainsTxHash(const BRMerkleBlock *block, UInt256 txHash);
     
     // verifies the block difficulty target is correct for the block's position in the chain
-    int BRMerkleBlockVerifyDifficulty(const BRSet *blockchain, const BRMerkleBlock *block, BRMerkleBlock *previous);
+    int BRMerkleBlockVerifyDifficulty(const BRMerkleBlock *block, BRMerkleBlock *previous);
     
     // returns the next expected target of the previous block
-    uint32_t DarkGravityWave(const BRSet *blocks, BRMerkleBlock *previous);
+    uint32_t DarkGravityWave(BRSet *blocks, BRMerkleBlock *previous);
     
     // returns a hash value for block suitable for use in a hashtable
     inline static size_t BRMerkleBlockHash(const void *block)

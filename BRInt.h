@@ -445,7 +445,7 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
     inline static UInt256 stdMultiply( UInt256 lhs, uint64_t factor ) {
         uint64_t carry = 0;
         for (int i = 0; i < WIDTH; i++) {
-            uint64_t n = carry + (uint32_t)factor * lhs.u32[i];
+            uint64_t n = carry + (uint64_t)factor * lhs.u32[i];
             lhs.u32[i] = n & 0xffffffff;
             carry = n >> 32;
         }
@@ -458,14 +458,14 @@ _hexc((u).u8[30] >> 4), _hexc((u).u8[30]), _hexc((u).u8[31] >> 4), _hexc((u).u8[
         return lhs;
     }
     
-    inline static UInt256 stdDivide( UInt256 lhs, uint64_t divisor ) {
-        UInt256 newDivisor = u64_to_u256( divisor );
+    inline static UInt256 stdDivide( UInt256 lhs, uint32_t divisor ) {
+        UInt256 newDivisor = setCompact( divisor );
         UInt256 div = newDivisor;
         UInt256 num = lhs;
         uint32_t num_bits = bits(num);
         uint32_t div_bits = bits(div);
         
-        lhs = u64_to_u256( 0 );
+        lhs = UINT256_ZERO;
         
         if ( div_bits == 0 || divisor == 0 ) {
             assert( div_bits == 0 || divisor == 0 );

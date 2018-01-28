@@ -1156,7 +1156,7 @@ static int _BRPeerManagerVerifyBlock(BRPeerManager *manager, BRMerkleBlock *bloc
     int r = 1;
     
     // verify block difficulty
-    if (! BRMerkleBlockVerifyDifficulty(manager->blocks, block, prev)) {
+    if (! BRMerkleBlockVerifyDifficulty(block, prev)) {
         peer_log(peer, "relayed block with invalid difficulty target %x, blockHash: %s", block->target,
                  u256_hex_encode(block->blockHash));
         r = 0;
