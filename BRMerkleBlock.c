@@ -292,10 +292,12 @@ int BRMerkleBlockIsValid(const BRMerkleBlock *block, uint32_t currentTime)
             if (block->scryptHash.u8[i] < t.u8[i]) break;
             if (block->scryptHash.u8[i] > t.u8[i]) r = 0;
         }
-        else {
+        else if (block->height >= LYRA) {
             if (block->lyraHash.u8[i] < t.u8[i]) break;
             if (block->lyraHash.u8[i] > t.u8[i]) r = 0;
         }
+        else
+            break;
     }
 
     return r;
